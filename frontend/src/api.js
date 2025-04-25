@@ -1,3 +1,6 @@
 import axios from 'axios';
-const API = axios.create({ baseURL: 'http://localhost:5000/api' });
+
+// Update the baseURL to point to the deployed backend
+const API = axios.create({ baseURL: 'https://dental-backend-5b4m.onrender.com/api' });
+
 export default API;

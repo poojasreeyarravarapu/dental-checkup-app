@@ -9,7 +9,7 @@ const Results = () => {
 
   useEffect(() => {
     // Fetch checkup results from the backend using checkupId
-    axios.get(`http://localhost:5000/api/checkup/results/${checkupId}`)
+    axios.get(axios.get(`https://dental-backend-5b4m.onrender.com/api/checkup/results/${checkupId}`))
       .then(response => {
         setCheckupData(response.data);
       })

@@ -21,7 +21,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/register', user);
+      const response = await axios.post('https://dental-backend-5b4m.onrender.com/api/auth/register', user);
       if (response.data.success) {
         navigate('/login'); // Redirect to login page after successful registration
       } else {

@@ -20,7 +20,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/login', credentials);
+      const response = await axios.post('https://dental-backend-5b4m.onrender.com/api/auth/login', credentials);
       if (response.data.success) {
         navigate('/dashboard'); // Redirect to the dashboard page after successful login
       } else {

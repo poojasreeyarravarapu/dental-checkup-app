@@ -3,35 +3,51 @@ const router = express.Router();
 const User = require('../models/User');  // Import User model
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator');
 
 // Registration route
-router.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
+router.post(
+  '/register',
+  [
+    body('email').isEmail().withMessage('Enter a valid email address'),
+    body('password')
+      .isLength({ min: 6 })
+      .withMessage('Password must be at least 6 characters long')
+  ],
+  async (req, res) => {
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
 
-  // Check if the user already exists
-  const userExists = await User.findOne({ email });
-  if (userExists) {
-    return res.status(400).json({ success: false, message: 'User already exists' });
+    const { name, email, password } = req.body;
+
+    // Check if the user already exists
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ success: false, message: 'User already exists' });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user instance
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword
+    });
+
+    try {
+      await newUser.save();
+      res.status(201).json({ success: true, message: 'Registration successful' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ success: false, message: 'Registration failed' });
+    }
   }
-
-  // Hash the password
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  // Create a new user instance
-  const newUser = new User({
-    name,
-    email,
-    password: hashedPassword
-  });
-
-  try {
-    await newUser.save();
-    res.status(201).json({ success: true, message: 'Registration successful' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: 'Registration failed' });
-  }
-});
+);
 
 // Login route
 router.post('/login', async (req, res) => {
@@ -63,7 +79,6 @@ router.post('/login', async (req, res) => {
       message: 'Login successful',
       token: token
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: 'Login failed' });
